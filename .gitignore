@@ -1,0 +1,5 @@
+*.o
+*.swp
+COPYRIGHT
+ntp-refclock
+refclock_names.h

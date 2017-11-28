@@ -1,0 +1,69 @@
+ntp-refclock
+============
+
+ntp-refclock is a wrapper for reference clock drivers included in the ntpd
+daemon (http://www.ntp.org/), which enables other NTP implementations to use
+the supported hardware reference clocks for synchronization of the system
+clock.
+
+It provides a minimal environment for the drivers to be able to run in a
+separate process, measuring the offset of the system clock relative to the
+reference clock and sending the measurements to another process controlling
+the system clock.
+
+Supported is chrony (https://chrony.tuxfamily.org) using the SOCK driver.
+In other applications the measurements can be parsed from the standard output.
+
+Installation
+------------
+
+Before building ntp-refclock, the ntp source code needs to be downloaded and
+compiled in a minimal configuration which enables the drivers that should be
+included in ntp-refclock. The openssl and threads support should be disabled.
+
+For example, to build ntpd with all reference clock drivers, run:
+
+$ ./configure --enable-all-clocks --enable-parse-clocks \
+	--without-crypto --without-threads --without-sntp
+$ make
+
+To build ntp-refclock, run:
+
+$ make NTP_SRC=$NTPDIR DEFAULT_USER=$USER DEFAULT_ROOTDIR=$ROOTDIR
+
+where $NTPDIR is the path to the compiled ntp source code, $USER is a user to
+which ntp-refclock should switch by default after start in order to drop the
+root privileges and $ROOTDIR is an empty directory to which should it change
+its root directory. If no DEFAULT_USER and DEFAULT_ROOTDIR is specified, they
+will be set to nobody and /var/empty respectively.
+
+To install the ntp-refclock binary and manual page to /usr/local, run:
+
+# make install prefix=/usr/local
+
+Usage
+-----
+
+The reference clock is specified on the ntp-refclock command line. The syntax
+is similar to the server and fudge directives of ntpd. The -s option specifies
+the location of the chronyd's socket where ntp-refclock should send the
+measurements. It needs to be started after chronyd to be able to connect to
+the socket. If multiple reference clocks are used, each clock needs to have
+a separate ntp-refclock instance.
+
+For example, if /dev/gps0 links to a serial port to which is connected a GPS
+receiver using the NMEA protocol at 115200 bps and the messages are late on
+average by 0.5 seconds, ntp-refclock using the NMEA driver can be started as:
+
+# ntp-refclock -s /var/run/chrony-NMEA.sock 127.127.20.0 mode 80 time2 0.5
+
+The chrony.conf file specifies the NMEA time source as a SOCK refclock and the
+PPS signal provided by the GPS (if it is available):
+
+refclock SOCK /var/run/chrony-NMEA.sock refid NMEA noselect delay 0.1
+refclock PPS /dev/pps0 refid GPS lock NMEA
+
+Author
+------
+
+Miroslav Lichvar <mlichvar@redhat.com>
