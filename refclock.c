@@ -97,11 +97,10 @@ static int receive_data(int fd, struct peer *peer) {
 	buf.recv_length = len;
 	buf.recv_peer = peer;
 
-	if (io->io_input && io->io_input(&buf))
-		return 1;
-
-	if (io->clock_recv)
-		io->clock_recv(&buf);
+	if (!io->io_input || io->io_input(&buf)) {
+		if (io->clock_recv)
+			io->clock_recv(&buf);
+	}
 
 	return 1;
 }
