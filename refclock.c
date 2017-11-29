@@ -67,41 +67,56 @@ static struct refclock_context refclock_context;
 
 static int receive_data(int fd, struct peer *peer) {
 	struct refclockio *io;
-	struct recvbuf buf;
+	struct recvbuf *rbuf;
 	size_t buf_len;
 	ssize_t len;
 	l_fp recv_time;
 
 	get_systime(&recv_time);
 
-	memset(&buf, 0, sizeof buf);
+	rbuf = get_free_recv_buffer();
 
 	io = &peer->procptr->io;
 
 	buf_len = io->datalen;
-	if (buf_len == 0 || buf_len > sizeof buf.recv_space)
-		buf_len = sizeof buf.recv_space;
+	if (buf_len == 0 || buf_len > sizeof rbuf->recv_space)
+		buf_len = sizeof rbuf->recv_space;
 
-	len = read(fd, &buf.recv_space, buf_len);
+	len = read(fd, &rbuf->recv_space, buf_len);
 
-	if (len < 0) {
-		if (errno == EAGAIN)
-			return 1;
-		fprintf(stderr, "read() failed: %m\n");
-		return 0;
-	} else if (len == 0) {
-		fprintf(stderr, "No more data to read\n");
+	if (len <= 0) {
+		freerecvbuf(rbuf);
+
+		if (len < 0) {
+			if (errno == EAGAIN)
+				return 1;
+			fprintf(stderr, "read() failed: %m\n");
+		} else {
+			fprintf(stderr, "No more data to read\n");
+		}
+
 		return 0;
 	}
 
-	buf.fd = fd;
-	buf.recv_length = len;
-	buf.recv_peer = peer;
-	buf.recv_time = recv_time;
+	rbuf->fd = fd;
+	rbuf->recv_length = len;
+	rbuf->recv_peer = peer;
+	rbuf->recv_time = recv_time;
 
-	if (!io->io_input || io->io_input(&buf)) {
+	assert(!has_full_recv_buffer());
+
+	if (!io->io_input || io->io_input(rbuf)) {
 		if (io->clock_recv)
-			io->clock_recv(&buf);
+			io->clock_recv(rbuf);
+	}
+
+	freerecvbuf(rbuf);
+
+	/* Process buffers added by the driver */
+	while ((rbuf = get_full_recv_buffer())) {
+		if (io->clock_recv)
+			io->clock_recv(rbuf);
+		freerecvbuf(rbuf);
 	}
 
 	return 1;

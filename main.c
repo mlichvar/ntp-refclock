@@ -31,6 +31,7 @@
 
 #include <config.h>
 #include <ntpd.h>
+#include <recvbuff.h>
 
 #include "refclock.h"
 #include "sock.h"
@@ -209,6 +210,7 @@ int main(int argc, char **argv) {
 	init_logging(progname, 0, 0);
 	init_lib();
 	init_refclock();
+	init_recvbuff(4);
 
 	if (!refclock_start(&conf))
 		return 1;
