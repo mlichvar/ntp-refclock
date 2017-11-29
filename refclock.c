@@ -70,11 +70,11 @@ static int receive_data(int fd, struct peer *peer) {
 	struct recvbuf buf;
 	size_t buf_len;
 	ssize_t len;
+	l_fp recv_time;
+
+	get_systime(&recv_time);
 
 	memset(&buf, 0, sizeof buf);
-
-	get_systime(&buf.recv_time);
-	buf.fd = fd;
 
 	io = &peer->procptr->io;
 
@@ -94,8 +94,10 @@ static int receive_data(int fd, struct peer *peer) {
 		return 0;
 	}
 
+	buf.fd = fd;
 	buf.recv_length = len;
 	buf.recv_peer = peer;
+	buf.recv_time = recv_time;
 
 	if (!io->io_input || io->io_input(&buf)) {
 		if (io->clock_recv)
