@@ -21,9 +21,11 @@ Before building ntp-refclock, the ntp source code needs to be downloaded and
 compiled in a minimal configuration which enables the drivers that should be
 included in ntp-refclock. The openssl and threads support should be disabled.
 
-For example, to build ntpd with all reference clock drivers, run:
+For example, to build ntpd with all drivers except those that have a
+counterpart in chrony, run:
 
 $ ./configure --enable-all-clocks --enable-parse-clocks \
+	--disable-ATOM --disable-SHM --disable-LOCAL-CLOCK \
 	--without-crypto --without-threads --without-sntp
 $ make
 
