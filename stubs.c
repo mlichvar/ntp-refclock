@@ -202,3 +202,50 @@ int sys_phone_add(char *number) {
 
 	return 0;
 }
+
+#ifndef DISABLE_EXTRA_STUBS
+/* The following functions are defined in order to reduce the number of objects
+   linked from libntp */
+
+u_int32 addr2refid(sockaddr_u *addr) {
+	assert(IS_IPV4(addr));
+	return NSRCADR(addr);
+}
+
+void init_systime(void) {
+}
+
+void get_systime(l_fp *now) {
+	struct timespec ts;
+
+	if (clock_gettime(CLOCK_REALTIME, &ts)) {
+		fprintf(stderr, "clock_gettime() failed: %m\n");
+		exit(1);
+	}
+
+	now->l_ui = ts.tv_sec + 2208988800U;
+	now->l_uf = ts.tv_nsec * 4.294967296;
+}
+
+isc_result_t isc_net_probeipv4(void) {
+	return ISC_R_NOTFOUND;
+}
+
+isc_result_t isc_net_probeipv6(void) {
+	return ISC_R_NOTFOUND;
+}
+
+void isc_assertion_failed(const char *file, int line, isc_assertiontype_t type,
+			  const char *cond) {
+	assert(0);
+}
+
+void isc_netaddr_fromsockaddr(isc_netaddr_t *t, const isc_sockaddr_t *s) {
+	assert(0);
+}
+
+isc_result_t isc_netaddr_masktoprefixlen(const isc_netaddr_t *s,
+					 unsigned int *lenp) {
+	return ISC_R_NOTIMPLEMENTED;
+}
+#endif
