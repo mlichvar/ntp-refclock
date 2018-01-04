@@ -83,7 +83,7 @@ static void print_help(const char *name) {
 		"  -s PATH\tSpecify path of chrony SOCK\n"
 		"  -u USER\tSpecify user to drop root privileges"
 		" (" DEFAULT_USER ")\n"
-		"  -d DIR\tSpecify directory to change after start"
+		"  -r DIR\tSpecify root directory"
 		" (" DEFAULT_ROOTDIR ")\n"
 		"  -c PATH\tSpecify path of clockstats log\n"
 		"  -p NUMBER\tSpecify phone number for modem drivers\n"
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
 
 	memset(&conf, 0, sizeof conf);
 
-	while ((opt = getopt(argc, argv, "+c:dlp:s:hv")) != -1) {
+	while ((opt = getopt(argc, argv, "+c:dlp:r:s:u:vh")) != -1) {
 		switch (opt) {
 		case 'c':
 			if (!clockstats_open(optarg))
@@ -178,6 +178,9 @@ int main(int argc, char **argv) {
 		case 'p':
 			if (!sys_phone_add(optarg))
 				return 1;
+			break;
+		case 'r':
+			dir = optarg;
 			break;
 		case 's':
 			sock = sock_open(optarg);
