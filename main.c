@@ -144,8 +144,8 @@ static int parse_refclock_args(int argc, char **argv,
 	return 1;
 }
 
-static void print_raw_sample(struct refclock_sample *sample) {
-	printf("RAW SAMPLE: time=%lld.%06u offset=%+.9f leap=%d\n",
+static void print_sample(struct refclock_sample *sample) {
+	printf("SAMPLE: time=%lld.%06u offset=%+.9f leap=%d\n",
 	       (long long)sample->time.tv_sec,
 	       (unsigned int)sample->time.tv_usec,
 	       sample->offset, sample->leap);
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
 			continue;
 
 		if (sock < 0 || debug > 0)
-			print_raw_sample(&sample);
+			print_sample(&sample);
 
 		if (sock >= 0 && !sock_send_sample(sock, &sample.time,
 						   sample.offset, sample.leap))
