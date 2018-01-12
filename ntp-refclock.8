@@ -1,0 +1,104 @@
+.TH ntp-refclock 8
+.SH NAME
+ntp-refclock \- measure offset of the system clock relative to a reference clock
+
+.SH SYNOPSIS
+\fBntp-refclock\fR [OPTION]... 127.127.\fITYPE\fR.\fIUNIT\fR [DRIVER-OPTION]...
+
+.SH DESCRIPTION
+
+\fBntp-refclock\fR is a wrapper for reference clock drivers included in the
+\fBntpd\fR daemon <http://www.ntp.org/>, which enables other NTP
+implementations to use the supported hardware reference clocks for
+synchronization of the system clock.
+
+It provides a minimal environment for the drivers to be able to run in a
+separate process, measuring the offset of the system clock relative to the
+reference clock and sending the measurements to another process controlling the
+system clock.
+
+The reference clock is specified on the command line as an IPv4 pseudo address
+127.127.\fITYPE\fR.\fIUNIT\fR, where \fITYPE\fR selects the driver and
+\fIUNIT\fR selects the device of the reference clock. The following driver
+options can be specified after the address:
+
+.TP 8
+\fBmode\fR \fIMODE\fR
+.TP 8
+\fBtime1\fR \fIFUDGE\fR
+.TP 8
+\fBtime2\fR \fIFUDGE\fR
+.TP 8
+\fBflag1\fR 0|1
+.TP 8
+\fBflag2\fR 0|1
+.TP 8
+\fBflag3\fR 0|1
+.TP 8
+\fBflag4\fR 0|1
+
+The meaning of the options is specific to each driver and is explained in their
+documentation.
+
+.SH OPTIONS
+
+.TP 8
+\fB-s\fR \fISOCKET\fR
+Send the measurements to the chrony SOCK refclock driver listening on
+\fISOCKET\fR. \fBntp-refclock\fR needs to be started after \fBchronyd\fR. If
+this option is not used, the measurements will be printed to the standard
+output.
+.TP 8
+\fB-u\fR \fIUSER\fR
+Run as \fIUSER\fR in order to drop the root privileges. The \fB-h\fR option
+prints the default user.
+.TP 8
+\fB-d\fR \fIDIR\fR
+Change the root directory of the process to \fIDIR\fR. The \fB-h\fR option
+prints the default root directory.
+.TP 8
+\fB-c\fR \fIFILE\fR
+Write reference clock statistics (clockstats) to \fIFILE\fR.
+.TP 8
+\fB-p\fR \fINUMBER\fR
+Specify a phone number for modem drivers. This option may be used multiple
+times to specify more than one number.
+.TP 8
+\fB-d\fR
+Increase debug level.
+.TP 8
+\fB-l\fR
+Print a list of drivers included in the \fBntp-refclock\fR binary.
+.TP 8
+\fB-v\fR
+Print version.
+.TP 8
+\fB-h\fR
+Print a help message.
+
+.SH EXAMPLES
+
+If /dev/gps0 links to a serial port to which is connected a GPS receiver using
+the NMEA protocol at 115200 bps and the messages are late on average by 0.5
+seconds, \fBntp-refclock\fR using the NMEA driver can be started as:
+
+.nf
+ntp-refclock -s /var/run/chrony-NMEA.sock 127.127.20.0 mode 80 time2 0.5
+.fi
+
+The chrony.conf file specifies the NMEA time source as a SOCK refclock and the
+PPS signal provided by the GPS (if it is available):
+
+.nf
+refclock SOCK /var/run/chrony-NMEA.sock refid NMEA noselect delay 0.1
+refclock PPS /dev/pps0 refid GPS lock NMEA
+.fi
+
+.SH SEE ALSO
+
+.BR chrony.conf (5),
+.BR chronyd (8),
+.BR ntpd (8)
+
+Documentation for ntp reference clock drivers
+<https://www.eecis.udel.edu/~mills/ntp/html/refclock.html>

@@ -48,7 +48,7 @@ COPYRIGHT: $(NTP_SRC)/COPYRIGHT
 install:
 	mkdir -p $(sbindir) $(man8dir)
 	install $(NAME) $(sbindir)
-	@#install -p -m 644 $(NAME).8 $(man8dir)
+	install -p -m 644 $(NAME).8 $(man8dir)
 
 clean:
 	-rm -rf $(OBJS) $(NAME) $(EXTRA_FILES)
