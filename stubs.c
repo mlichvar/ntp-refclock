@@ -165,7 +165,7 @@ void clockstats_close(void) {
    the drivers to use PPS */
 void sys_leap_update(void) {
 	struct ntptimeval ntv;
-	int state, sys_leap;
+	int state;
 
 	state = ntp_gettime(&ntv);
 
