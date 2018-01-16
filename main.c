@@ -26,6 +26,7 @@
 #include <getopt.h>
 #include <grp.h>
 #include <pwd.h>
+#include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -36,6 +37,8 @@
 #include "refclock.h"
 #include "sock.h"
 #include "stubs.h"
+
+static int quit_signal;
 
 static int drop_root_privileges(const char *user, const char *dir) {
 	struct passwd *pw;
@@ -70,6 +73,32 @@ static int drop_root_privileges(const char *user, const char *dir) {
 	if (setuid(pw->pw_uid)) {
 		fprintf(stderr, "setuid(%d) failed: %m\n", pw->pw_uid);
 		return 0;
+	}
+
+	return 1;
+}
+
+static void handle_signal(int signal) {
+	quit_signal = signal;
+}
+
+static int set_signal_handler(void) {
+	struct sigaction sa;
+	int i, signals[] = {SIGINT, SIGTERM, SIGQUIT, SIGHUP};
+
+	sa.sa_handler = handle_signal;
+	sa.sa_flags = SA_RESTART;
+
+	if (sigemptyset(&sa.sa_mask) < 0) {
+		fprintf(stderr, "sigemptyset() failed: %m\n");
+		return 0;
+	}
+
+	for (i = 0; i < sizeof signals / sizeof signals[0]; i++) {
+		if (sigaction(signals[i], &sa, NULL) < 0) {
+			fprintf(stderr, "sigaction() failed: %m\n");
+			return 0;
+		}
 	}
 
 	return 1;
@@ -160,7 +189,7 @@ int main(int argc, char **argv) {
 	struct refclock_config conf;
 	struct refclock_sample sample;
 	const char *user, *dir;
-	int opt, ret, sock;
+	int opt, sock;
 
 	user = DEFAULT_USER;
 	dir = DEFAULT_ROOTDIR;
@@ -220,15 +249,16 @@ int main(int argc, char **argv) {
 	init_refclock();
 	init_recvbuff(4);
 
+	if (!set_signal_handler())
+		return 1;
+
 	if (!refclock_start(&conf))
 		return 1;
 
 	if (geteuid() == 0 && !drop_root_privileges(user, dir))
 		return 1;
 
-	ret = 2;
-
-	while (1) {
+	for (quit_signal = 0; !quit_signal; ) {
 		if (!refclock_run())
 			break;
 
@@ -249,5 +279,12 @@ int main(int argc, char **argv) {
 	if (sock >= 0)
 		sock_close(sock);
 
-	return ret;
+	if (!quit_signal) {
+		fprintf(stderr, "Exiting on error\n");
+		return 2;
+	}
+
+	fprintf(stderr, "Exiting on signal %d\n", quit_signal);
+
+	return 0;
 }
