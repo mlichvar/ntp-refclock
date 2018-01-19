@@ -75,6 +75,10 @@ static int receive_data(int fd, struct peer *peer) {
 	get_systime(&recv_time);
 
 	rbuf = get_free_recv_buffer();
+	if (!rbuf) {
+		fprintf(stderr, "Could not get recv buffer\n");
+		return 0;
+	}
 
 	io = &peer->procptr->io;
 
