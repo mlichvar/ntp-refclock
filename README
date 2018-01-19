@@ -53,17 +53,8 @@ measurements. It needs to be started after chronyd to be able to connect to
 the socket. If multiple reference clocks are used, each clock needs to have
 a separate ntp-refclock instance.
 
-For example, if /dev/gps0 links to a serial port to which is connected a GPS
-receiver using the NMEA protocol at 115200 bps and the messages are late on
-average by 0.5 seconds, ntp-refclock using the NMEA driver can be started as:
-
-# ntp-refclock -s /var/run/chrony-NMEA.sock 127.127.20.0 mode 80 time2 0.5
-
-The chrony.conf file specifies the NMEA time source as a SOCK refclock and the
-PPS signal provided by the GPS (if it is available):
-
-refclock SOCK /var/run/chrony-NMEA.sock refid NMEA noselect delay 0.1
-refclock PPS /dev/pps0 refid GPS lock NMEA
+Some examples of using ntp-refclock with chronyd are included in the
+ntp-refclock man page.
 
 Author
 ------

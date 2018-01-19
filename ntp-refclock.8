@@ -51,17 +51,20 @@ output.
 .TP 8
 \fB-u\fR \fIUSER\fR
 Run as \fIUSER\fR in order to drop the root privileges. The \fB-h\fR option
-prints the default user.
+prints the default user. This option is ignored if \fBntp-refclock\fR is
+started under a non-root user.
 .TP 8
 \fB-d\fR \fIDIR\fR
 Change the root directory of the process to \fIDIR\fR. The \fB-h\fR option
-prints the default root directory.
+prints the default root directory. This option is ignored if \fBntp-refclock\fR
+is started under a non-root user.
 .TP 8
 \fB-c\fR \fIFILE\fR
-Write reference clock statistics (clockstats) to \fIFILE\fR.
+Write reference clock statistics (clockstats) to \fIFILE\fR. If \fIFILE\fR is
+-, the statistics will be printed to the standard output.
 .TP 8
 \fB-p\fR \fINUMBER\fR
-Specify a phone number for modem drivers. This option may be used multiple
+Specify phone \fINUMBER\fR for modem drivers. This option may be used multiple
 times to specify more than one number.
 .TP 8
 \fB-d\fR
@@ -78,27 +81,109 @@ Print a help message.
 
 .SH EXAMPLES
 
-If /dev/gps0 links to a serial port to which is connected a GPS receiver using
-the NMEA protocol at 115200 bps and the messages are late on average by 0.5
-seconds, \fBntp-refclock\fR using the NMEA driver can be started as:
+.SS GPS_NMEA driver
+
+With a GPS receiver connected to a serial port using the NMEA protocol, the
+\fBntp-refclock\fR command could be:
 
 .nf
 ntp-refclock -s /var/run/chrony-NMEA.sock 127.127.20.0 mode 80 time2 0.5
 .fi
 
-The chrony.conf file specifies the NMEA time source as a SOCK refclock and the
-PPS signal provided by the GPS (if it is available):
+The driver will use /dev/gps0 to access the serial device, which could be a
+symbolic link to /dev/ttyS0 for instance. The \fBmode\fR option selects the
+baud rate (115200 bps) and \fBtime2\fR specifies the delay of the received
+messages (0.5 seconds).
+
+The time source needs to be specified in chrony.conf as a SOCK refclock. If the
+GPS receiver provides also a PPS signal, the configuration could be:
 
 .nf
-refclock SOCK /var/run/chrony-NMEA.sock refid NMEA noselect delay 0.1
+refclock SOCK /var/run/chrony-NMEA.sock refid NMEA delay 0.1 noselect
 refclock PPS /dev/pps0 refid GPS lock NMEA
+.fi
+
+If the drivers have been compiled with PPS support, the PPS signal can be
+processed by the GPS_NMEA driver itself. If the \fBflag1\fR option is set to 1,
+the driver will use /dev/gpspps0 to access the PPS device (which can link to
+/dev/pps0). The command could be:
+
+.nf
+ntp-refclock -s /var/run/chrony-GPS.sock 127.127.20.0 mode 80 flag1 1 time2 0.5
+.fi
+
+In this case chrony.conf could specify just the SOCK refclock without the
+\fBnoselect\fR option:
+
+.nf
+refclock SOCK /var/run/chrony-GPS.sock refid GPS
+.fi
+
+A systemd unit file which attaches the PPS device with \fBldattach\fR, creates
+the symbolic links and starts \fBntp-refclock\fR automatically on boot after
+\fBchronyd\fR could be:
+
+.nf
+[Unit]
+Description=GPS reference clock
+After=chronyd.service
+BindsTo=chronyd.service
+
+[Service]
+ExecStartPre=/bin/ln -sf pps0 /dev/gpspps0
+ExecStartPre=/bin/ln -sf ttyS0 /dev/gps0
+ExecStart=/bin/sh -c 'ldattach 18 /dev/ttyS0; \\
+ntp-refclock -s /var/run/chrony-GPS.sock 127.127.20.0 mode 80 time2 0.5 flag1 1'
+ExecStopPost=/bin/rm -f /dev/gps0 /dev/gpspps0
+
+[Install]
+WantedBy=multi-user.target
+.fi
+
+On Linux, the symbolic links can be created automatically also by writing udev
+rules to a file in /etc/udev/rules.d/:
+
+.nf
+KERNEL=="ttyS0", SUBSYSTEM=="tty", SYMLINK+="gps0"
+KERNEL=="pps0", SUBSYSTEM=="pps", SYMLINK+="gpspps0"
+.fi
+
+.SS PARSE driver
+
+With a DCF77 receiver connected to a serial port and sending raw DCF pulses,
+the \fBntp-refclock\fR command could be:
+
+.nf
+ntp-refclock -s /var/run/chrony-DCFa.sock 127.127.8.0 mode 142 time2 0.034
+.fi
+
+The driver will use /dev/refclock-0 to access the serial device and
+/dev/refclockpps-0 to access the PPS device. The \fBmode\fR option selects a
+RAWDCF variant of the clock (type 14) and enables PPS (128 added to the mode).
+The \fBtime2\fR option specifies the offset of the PPS signal (34
+milliseconds), which should correspond to the physical distance of the receiver
+from the DCF77 transmitter in Germany.
+
+The time source could be specified in chrony.conf as:
+
+.nf
+refclock SOCK /var/run/chrony-DCFa.sock refid DCFa delay 0.01
+.fi
+
+If the DCF77 receiver used the Meinberg time string format instead of raw DCF
+pulses, the \fBntp-refclock\fR command could be:
+
+.nf
+ntp-refclock -s /var/run/chrony-DCFa.sock 127.127.8.0 mode 2 time1 0.034
 .fi
 
 .SH SEE ALSO
 
 .BR chrony.conf (5),
 .BR chronyd (8),
-.BR ntpd (8)
+.BR ldattach (8),
+.BR systemd.service (5),
+.BR udev (7)
 
 Documentation for ntp reference clock drivers
 <https://www.eecis.udel.edu/~mills/ntp/html/refclock.html>
