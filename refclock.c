@@ -130,9 +130,11 @@ int refclock_start(struct refclock_config *conf) {
 	struct refclock_context *refclock = &refclock_context;
 	struct peer *peer = &refclock->peer;
 
-	if (conf->type >= num_refclock_conf ||
-	    refclock_conf[conf->type]->clock_start == noentry) {
-		fprintf(stderr, "Refclock type %d is not available\n",
+	if (conf->type == 0 || conf->type >= num_refclock_conf) {
+		fprintf(stderr, "Invalid refclock type %u\n", conf->type);
+		return 0;
+	} else if (refclock_conf[conf->type]->clock_start == noentry) {
+		fprintf(stderr, "Missing driver for refclock type %u\n",
 			conf->type);
 		return 0;
 	}
