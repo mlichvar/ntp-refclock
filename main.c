@@ -120,7 +120,7 @@ static void print_help(const char *name) {
 		"  -u USER\tRun as USER (default: " DEFAULT_USER ")\n"
 		"  -r DIR\tChange root directory to DIR (default: " DEFAULT_ROOTDIR ")\n"
 		"  -c FILE\tWrite reference clock statistics to FILE\n"
-		"  -p NUMBER\tSpecify phone number for modem drivers\n"
+		"  -p NUMBER\tSpecify phone NUMBER for modem drivers\n"
 		"  -d\t\tIncrease debug level\n"
 		"  -l\t\tPrint available drivers\n"
 		"  -v\t\tPrint version\n"
