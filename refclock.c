@@ -83,10 +83,10 @@ static int receive_data(int fd, struct peer *peer) {
 	io = &peer->procptr->io;
 
 	buf_len = io->datalen;
-	if (buf_len == 0 || buf_len > sizeof rbuf->recv_space)
-		buf_len = sizeof rbuf->recv_space;
+	if (buf_len == 0 || buf_len > sizeof rbuf->recv_buffer)
+		buf_len = sizeof rbuf->recv_buffer;
 
-	len = read(fd, &rbuf->recv_space, buf_len);
+	len = read(fd, &rbuf->recv_buffer, buf_len);
 
 	if (len <= 0) {
 		freerecvbuf(rbuf);
