@@ -21,9 +21,14 @@ NTP_LDFLAGS=-lm -L$(NTP_BUILD)/libntp -lntp \
 OBJS=main.o refclock.o sock.o stubs.o
 EXTRA_FILES=refclock_names.h COPYRIGHT
 
+NTP_RELEASE:=$(shell awk -F '[. p"]' \
+		     '/ VERSION /{ printf "%d%02d%02d%02d", $$4, $$5, $$6, $$7 }' \
+		     $(NTP_SRC)/config.h)
+
 CPPFLAGS=-I$(NTP_BUILD) -I$(NTP_SRC)/include -I$(NTP_SRC)/lib/isc/include \
 	 -I$(NTP_SRC)/lib/isc/unix/include \
 	 -DPROGRAM_NAME=\"$(NAME)\" -DPROGRAM_VERSION=\"$(VERSION)\" \
+	 -DNTP_RELEASE=$(NTP_RELEASE) \
 	 -DDEFAULT_USER=\"$(DEFAULT_USER)\" \
 	 -DDEFAULT_ROOTDIR=\"$(DEFAULT_ROOTDIR)\"
 

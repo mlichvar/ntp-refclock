@@ -56,7 +56,11 @@ static FILE *clockstats_file = NULL;
 /* Called by refclock_control() */
 struct peer *findexistingpeer(sockaddr_u *addr, const char *hostname,
 			      struct peer *start_peer, int mode,
-			      u_char cast_flags) {
+			      u_char cast_flags
+#if NTP_RELEASE >= 4020811
+			      , int *ip_count
+#endif
+			      ) {
 	struct peer *peer;
 
 	peer = refclock_get_peer();
