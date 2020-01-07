@@ -245,6 +245,7 @@ int main(int argc, char **argv) {
 	progname = argv[0];
 
 	init_logging(progname, 0, 0);
+	closelog();
 	syslogit = FALSE;
 	msyslog_term = TRUE;
 	msyslog_include_timestamp = FALSE;
