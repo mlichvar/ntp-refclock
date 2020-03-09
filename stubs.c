@@ -81,7 +81,11 @@ void clock_filter(struct peer *peer, double sample_offset,
 }
 
 /* Called by refclock_transmit() */
-void poll_update(struct peer *peer, u_char mpoll) {
+void poll_update(struct peer *peer, u_char mpoll
+#if NTP_RELEASE >= 4020814
+		 , u_char skewpoll
+#endif
+		 ) {
 	peer->nextdate += 1U << peer->hpoll;
 }
 
