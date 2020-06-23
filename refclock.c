@@ -74,7 +74,11 @@ static int receive_data(int fd, struct peer *peer) {
 
 	get_systime(&recv_time);
 
-	rbuf = get_free_recv_buffer();
+	rbuf = get_free_recv_buffer(
+#if NTP_RELEASE >= 4020815
+				    TRUE
+#endif
+				   );
 	if (!rbuf) {
 		fprintf(stderr, "Could not get recv buffer\n");
 		return 0;
