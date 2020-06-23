@@ -1,3 +1,6 @@
+0.4 (2020-06-23)
+- add support for ntp-4.2.8p15
+
 0.3 (2020-03-09)
 - add support for ntp-4.2.8p14
 - improve logging (Michael Weiser)
