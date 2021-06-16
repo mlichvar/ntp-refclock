@@ -30,6 +30,7 @@ struct refclock_config {
 	unsigned int type;
 	unsigned int unit;
 	unsigned int mode;
+	unsigned char poll;
 	struct refclockstat stat;
 };
 

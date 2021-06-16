@@ -121,6 +121,7 @@ static void print_help(const char *name) {
 		"  -u USER\tRun as USER (default: " DEFAULT_USER ")\n"
 		"  -r DIR\tChange root directory to DIR (default: " DEFAULT_ROOTDIR ")\n"
 		"  -c FILE\tWrite reference clock statistics to FILE\n"
+		"  -i INTERVAL\tSet minpoll and maxpoll to INTERVAL (default: 6)\n"
 		"  -p NUMBER\tSpecify phone NUMBER for modem drivers\n"
 		"  -d\t\tIncrease debug level\n"
 		"  -l\t\tPrint available drivers\n"
@@ -197,8 +198,9 @@ int main(int argc, char **argv) {
 	sock = -1;
 
 	memset(&conf, 0, sizeof conf);
+	conf.poll = 6;
 
-	while ((opt = getopt(argc, argv, "+c:dlp:r:s:u:vh")) != -1) {
+	while ((opt = getopt(argc, argv, "+c:dli:p:r:s:u:vh")) != -1) {
 		switch (opt) {
 		case 'c':
 			if (!clockstats_open(optarg))
@@ -210,6 +212,9 @@ int main(int argc, char **argv) {
 		case 'l':
 			refclock_print_drivers();
 			return 0;
+		case 'i':
+			conf.poll = atoi(optarg);
+			break;
 		case 'p':
 			if (!sys_phone_add(optarg))
 				return 1;

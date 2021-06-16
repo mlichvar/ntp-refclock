@@ -63,6 +63,12 @@ is started under a non-root user.
 Write reference clock statistics (clockstats) to \fIFILE\fR. If \fIFILE\fR is
 -, the statistics will be printed to the standard output.
 .TP 8
+\fB-i\fR \fIINTERVAL\fR
+Set the \fBminpoll\fR and \fBmaxpoll\fR values of the time source. This can
+be useful with drivers that produce samples at the source polling interval
+instead of the one-second driver timer or message rate of the device. Some
+drivers override this setting. The default value is 6 (64 seconds).
+.TP 8
 \fB-p\fR \fINUMBER\fR
 Specify phone \fINUMBER\fR for modem drivers. This option may be used multiple
 times to specify more than one number.

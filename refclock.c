@@ -148,7 +148,7 @@ int refclock_start(struct refclock_config *conf) {
 	AF(&peer->srcadr) = AF_INET;
 	SET_ADDR4(&peer->srcadr, REFCLOCK_ADDR | conf->type << 8 | conf->unit);
 	peer->ttl = conf->mode;
-	peer->hpoll = peer->minpoll = peer->maxpoll = 6;
+	peer->hpoll = peer->minpoll = peer->maxpoll = conf->poll;
 
 	if (!refclock_newpeer(peer))
 		return 0;
