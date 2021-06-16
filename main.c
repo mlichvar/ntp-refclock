@@ -31,6 +31,7 @@
 #include <unistd.h>
 
 #include <config.h>
+#include <ntp_calendar.h>
 #include <ntpd.h>
 #include <recvbuff.h>
 
@@ -253,6 +254,10 @@ int main(int argc, char **argv) {
 	init_lib();
 	init_refclock();
 	init_recvbuff(4);
+
+#if NTP_RELEASE >= 4020813
+	basedate_set_day(basedate_eval_buildstamp() - 14);
+#endif
 
 	if (!set_signal_handler())
 		return 1;
