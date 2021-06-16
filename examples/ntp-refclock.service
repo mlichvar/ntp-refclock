@@ -1,0 +1,13 @@
+[Unit]
+Description=Hardware reference clock driver
+After=chronyd.service
+BindsTo=chronyd.service
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/ntp-refclock
+ExecStart=/usr/sbin/ntp-refclock $OPTIONS
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

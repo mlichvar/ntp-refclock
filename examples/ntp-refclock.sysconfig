@@ -1,0 +1,1 @@
+OPTIONS="-s /run/chrony-GPS.sock 127.127.20.0 mode 80 flag1 1 time2 0.5"

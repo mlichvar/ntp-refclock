@@ -1,0 +1,11 @@
+# Serial device for the NMEA driver
+#KERNEL=="ttyS0", SUBSYSTEM=="tty", SYMLINK+="gps0"
+
+# PPS device for the NMEA driver
+#KERNEL=="pps0", SUBSYSTEM=="pps", SYMLINK+="gpspps0"
+
+# Serial device for the PALISADE driver
+#KERNEL=="ttyS0", SUBSYSTEM=="tty", SYMLINK+="palisade0"
+
+# Start ldattach on the serial device to create the PPS device
+#KERNEL=="ttyS0", TAG+="systemd", ENV{SYSTEMD_WANTS}="pps-ldattach@%k.service"

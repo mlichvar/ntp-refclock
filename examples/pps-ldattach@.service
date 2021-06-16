@@ -1,0 +1,12 @@
+[Unit]
+Description=Attach PPS driver to /dev/%I
+Before=chronyd.service ntp-refclock.service
+After=dev-%i.device
+BindsTo=dev-%i.device
+
+[Service]
+Type=forking
+ExecStart=/sbin/ldattach 18 /dev/%I
+
+[Install]
+WantedBy=multi-user.target
