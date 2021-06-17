@@ -1,3 +1,8 @@
+0.5 (2021-06-17)
+- fix GPS week expansion
+- add -i option to configure minpoll and maxpoll
+- include examples of systemd and udev files
+
 0.4 (2020-06-23)
 - add support for ntp-4.2.8p15
 
