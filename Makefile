@@ -15,7 +15,7 @@ NTP_SRC=ntp
 NTP_BUILD=$(NTP_SRC)
 
 NTP_OBJS=$(NTP_BUILD)/ntpd/ntp_refclock.o $(NTP_BUILD)/ntpd/refclock_*.o
-NTP_LDFLAGS=-lm -L$(NTP_BUILD)/libntp -lntp \
+NTP_LDFLAGS=-lm -L$(NTP_BUILD)/libntp -lntp -L$(NTP_BUILD)/ntpd -lntpd \
 	  $(shell test -e $(NTP_BUILD)/libparse/libparse.a && \
 		  echo -L$(NTP_BUILD)/libparse -lparse)
 OBJS=main.o refclock.o sock.o stubs.o
@@ -26,7 +26,8 @@ NTP_RELEASE:=$(shell awk -F '[. p"]' \
 		     $(NTP_SRC)/config.h)
 
 CPPFLAGS=-I$(NTP_BUILD) -I$(NTP_SRC)/include -I$(NTP_SRC)/lib/isc/include \
-	 -I$(NTP_SRC)/lib/isc/unix/include \
+	 -I$(NTP_SRC)/lib/isc/unix/include -I$(NTP_SRC)/libntp/lib/isc/include \
+	 -I$(NTP_SRC)/libntp/lib/isc/unix/include \
 	 -DPROGRAM_NAME=\"$(NAME)\" -DPROGRAM_VERSION=\"$(VERSION)\" \
 	 -DNTP_RELEASE=$(NTP_RELEASE) \
 	 -DDEFAULT_USER=\"$(DEFAULT_USER)\" \
