@@ -51,7 +51,7 @@ refclock_names.h: $(NTP_SRC)/include/ntp.h
 COPYRIGHT: $(NTP_SRC)/COPYRIGHT
 	cp -p $^ $@
 
-install:
+install: $(NAME)
 	mkdir -p $(sbindir) $(man8dir)
 	install $(NAME) $(sbindir)
 	install -p -m 644 $(NAME).8 $(man8dir)
