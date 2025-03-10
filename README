@@ -41,7 +41,7 @@ will be set to nobody and /var/empty respectively.
 
 To install the ntp-refclock binary and manual page to /usr/local, run:
 
-# make install prefix=/usr/local
+# make install NTP_SRC=$NTPDIR prefix=/usr/local
 
 Usage
 -----
