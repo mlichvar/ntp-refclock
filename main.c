@@ -122,7 +122,7 @@ static void print_help(const char *name) {
 		"  -r DIR\tChange root directory to DIR (default: " DEFAULT_ROOTDIR ")\n"
 		"  -c FILE\tWrite reference clock statistics to FILE\n"
 		"  -i INTERVAL\tSet minpoll and maxpoll to INTERVAL (default: 6)\n"
-		"  -p NUMBER\tSpecify phone NUMBER for modem drivers\n"
+		"  -p AT-COMMAND\tSpecify phone number as AT command for modem drivers\n"
 		"  -d\t\tIncrease debug level\n"
 		"  -l\t\tPrint available drivers\n"
 		"  -v\t\tPrint version\n"
