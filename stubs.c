@@ -133,6 +133,7 @@ void record_clock_stats(sockaddr_u *addr, const char *text) {
 }
 
 void report_event(int err, struct peer *peer, const char *str) {
+	DPRINTF(2, ("report_event: %s\n", str));
 }
 
 char *add_var(struct ctl_var **kv, u_long size, u_short def) {
