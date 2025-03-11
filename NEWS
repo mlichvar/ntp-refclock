@@ -1,3 +1,8 @@
+0.7 (2025-03-11)
+- close refclock IO file descriptor
+- print event names in debug output
+- fix description of -p option
+
 0.6 (2023-06-01)
 - add support for ntp-4.2.8p16
 
