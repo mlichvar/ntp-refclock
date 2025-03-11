@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <sys/timex.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <config.h>
 #include <ntpd.h>
@@ -94,6 +95,8 @@ int io_addclock(struct refclockio *rio) {
 }
 
 void io_closeclock(struct refclockio *rio) {
+	close(rio->fd);
+	rio->fd = -1;
 }
 
 int mprintf_clock_stats(sockaddr_u *addr, const char *fmt, ...) {
