@@ -69,9 +69,10 @@ be useful with drivers that produce samples at the source polling interval
 instead of the one-second driver timer or message rate of the device. Some
 drivers override this setting. The default value is 6 (64 seconds).
 .TP 8
-\fB-p\fR \fINUMBER\fR
-Specify phone \fINUMBER\fR for modem drivers. This option may be used multiple
-times to specify more than one number.
+\fB-p\fR \fIAT-COMMAND\fR
+Specify the AT command that modem drivers should send to the modem to dial a
+phone number. This option can be repeated up to 10 times to specify multiple
+phone numbers.
 .TP 8
 \fB-d\fR
 Increase debug level.
